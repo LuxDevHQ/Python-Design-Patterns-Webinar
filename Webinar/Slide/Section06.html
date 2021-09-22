@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abstractions &mdash; Design Patterns 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Demos" href="Section07.html" />
+    <link rel="prev" title="Refactor for adaptability" href="Section05.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Design Patterns
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Section01.html">Design Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section02.html">Case Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section03.html">Version One</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section04.html">Refactor for clarity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section04.html#version-two">Version Two</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section05.html">Refactor for adaptability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section05.html#version-three">Version Three</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Abstractions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#parser-abstraction">Parser abstraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mapper-abstraction">Mapper Abstraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#logger-abstraction">Logger Abstraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#validator-abstraction">Validator Abstraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#repository-abstraction">Repository Abstraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#postgres-repository">Postgres Repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#textfile-repository">TextFile Repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reader-abstraction">Reader Abstraction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#version-4">Version 4</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section07.html">Demos</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Design Patterns</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Abstractions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Section06.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="abstractions">
+<h1>Abstractions<a class="headerlink" href="#abstractions" title="Permalink to this headline"></a></h1>
+<section id="parser-abstraction">
+<h2>Parser abstraction<a class="headerlink" href="#parser-abstraction" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="k">class</span> <span class="nc">Parser</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="linenos"> 4</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validator</span><span class="p">:</span> <span class="n">Validator</span><span class="p">,</span> <span class="n">mapper</span><span class="p">:</span> <span class="n">Mapper</span><span class="p">):</span>
+<span class="linenos"> 5</span>        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span> <span class="o">=</span> <span class="n">validator</span>
+<span class="linenos"> 6</span>        <span class="bp">self</span><span class="o">.</span><span class="n">mapper</span> <span class="o">=</span> <span class="n">mapper</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span>    <span class="k">def</span> <span class="nf">parse_trades</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trade_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="linenos"> 9</span>        <span class="n">trades</span><span class="p">:</span> <span class="n">T</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">10</span>        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">record</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trade_data</span><span class="p">):</span>
+<span class="linenos">11</span>            <span class="n">fields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+<span class="linenos">12</span>            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+<span class="linenos">13</span>                <span class="k">continue</span>
+<span class="linenos">14</span>            <span class="n">trade</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapper</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
+<span class="linenos">15</span>            <span class="n">trades</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trade</span><span class="p">)</span>
+<span class="linenos">16</span>        <span class="k">return</span> <span class="n">trades</span>
+<span class="linenos">17</span>
+<span class="linenos">18</span>    <span class="nd">@abstractmethod</span>
+<span class="linenos">19</span>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="linenos">20</span>        <span class="k">pass</span>
+</pre></div>
+</div>
+</section>
+<section id="mapper-abstraction">
+<h2>Mapper Abstraction<a class="headerlink" href="#mapper-abstraction" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">class</span> <span class="nc">Mapper</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="nd">@abstractmethod</span>
+<span class="linenos">3</span>    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="linenos">4</span>        <span class="k">pass</span>
+</pre></div>
+</div>
+</section>
+<section id="logger-abstraction">
+<h2>Logger Abstraction<a class="headerlink" href="#logger-abstraction" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">class</span> <span class="nc">Logger</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="nd">@abstractmethod</span>
+<span class="linenos">3</span>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+<span class="linenos">4</span>        <span class="k">pass</span>
+</pre></div>
+</div>
+</section>
+<section id="validator-abstraction">
+<h2>Validator Abstraction<a class="headerlink" href="#validator-abstraction" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">class</span> <span class="nc">Validator</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">Logger</span><span class="p">):</span>
+<span class="linenos">3</span>        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+<span class="linenos">4</span>
+<span class="linenos">5</span>    <span class="nd">@abstractmethod</span>
+<span class="linenos">6</span>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">record_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="linenos">7</span>        <span class="k">pass</span>
+</pre></div>
+</div>
+<p><strong>Current Parser UML Diagram</strong></p>
+<img alt="_images/parseruml.png" src="_images/parseruml.png" />
+<p>The Mapper abstraction can have many implementations mapping to different objects</p>
+<img alt="_images/mapperuml.png" src="_images/mapperuml.png" />
+<p>The Validator abstraction can also have many implementations</p>
+<img alt="_images/validatoruml.png" src="_images/validatoruml.png" />
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<dl class="simple">
+<dt>The Strategy Pattern</dt><dd><p>Define a family of algorithms, encapsulate each one and make them interchangeable.
+Strategy lets the algorithm vary independently from the clients that use it.</p>
+</dd>
+</dl>
+</div>
+<p>The Logger abstraction can also have many implementations</p>
+<img alt="_images/loggeruml.png" src="_images/loggeruml.png" />
+<p><strong>The Parser class too can have many different parser implementations</strong></p>
+<img alt="_images/Parseuml.png" src="_images/Parseuml.png" />
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<dl class="simple">
+<dt>The Template Pattern</dt><dd><p>Define the skeleton of an algorithm in an operation, deferring some steps to subclasses. Template
+Method lets subclasses redefine certain steps of an algorithm without changing the algorithm’s structure.</p>
+</dd>
+</dl>
+</div>
+<p>Here is the overall diagram of all the abstractions and some of their concrete impelmentations.</p>
+<img alt="_images/parsecomplete.png" src="_images/parsecomplete.png" />
+<p>Examples of Parser classes</p>
+<ol class="arabic simple">
+<li><p>CommaParser class</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">class</span> <span class="nc">CommaParser</span><span class="p">(</span><span class="n">Parser</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validator</span><span class="p">:</span> <span class="n">Validator</span><span class="p">,</span> <span class="n">mapper</span><span class="p">:</span> <span class="n">Mapper</span><span class="p">):</span>
+<span class="linenos">3</span>        <span class="n">Parser</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">mapper</span><span class="p">)</span>
+<span class="linenos">4</span>
+<span class="linenos">5</span>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="linenos">6</span>        <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li><p>SpaceParser class</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">class</span> <span class="nc">SpaceParser</span><span class="p">(</span><span class="n">Parser</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validator</span><span class="p">:</span> <span class="n">Validator</span><span class="p">,</span> <span class="n">mapper</span><span class="p">:</span> <span class="n">Mapper</span><span class="p">):</span>
+<span class="linenos">3</span>        <span class="n">Parser</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">mapper</span><span class="p">)</span>
+<span class="linenos">4</span>
+<span class="linenos">5</span>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="linenos">6</span>        <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<dl class="simple">
+<dt>Dependency Inversion</dt><dd><p>Dependencies get created before the classes that use them.</p>
+</dd>
+</dl>
+</div>
+</section>
+<section id="repository-abstraction">
+<h2>Repository Abstraction<a class="headerlink" href="#repository-abstraction" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">class</span> <span class="nc">Repository</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">Logger</span><span class="p">):</span>
+<span class="linenos">3</span>        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+<span class="linenos">4</span>
+<span class="linenos">5</span>    <span class="nd">@abstractmethod</span>
+<span class="linenos">6</span>    <span class="k">def</span> <span class="nf">store_records</span><span class="p">(</span><span class="n">records</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">7</span>        <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Examples of repository implementations</p>
+</section>
+<section id="postgres-repository">
+<h2>Postgres Repository<a class="headerlink" href="#postgres-repository" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">class</span> <span class="nc">PostgresRepo</span><span class="p">(</span><span class="n">Repository</span><span class="p">):</span>
+<span class="linenos"> 2</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">cnn_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="linenos"> 3</span>        <span class="bp">self</span><span class="o">.</span><span class="n">cnn_string</span> <span class="o">=</span> <span class="n">cnn_string</span>
+<span class="linenos"> 4</span>        <span class="n">Repository</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span>    <span class="k">def</span> <span class="nf">store_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">records</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TradeRecord</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos"> 7</span>        <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cnn_string</span><span class="p">)</span>
+<span class="linenos"> 8</span>        <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+<span class="linenos"> 9</span>        <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+<span class="linenos">10</span>        <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="linenos">11</span>        <span class="k">for</span> <span class="n">trade</span> <span class="ow">in</span> <span class="n">trades</span><span class="p">:</span>
+<span class="linenos">12</span>            <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">trade</span><span class="p">)</span>
+<span class="linenos">13</span>        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="linenos">14</span>        <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="linenos">15</span>        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">trades</span><span class="p">)</span><span class="si">}</span><span class="s1"> records have saved&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="textfile-repository">
+<h2>TextFile Repository<a class="headerlink" href="#textfile-repository" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">class</span> <span class="nc">TextFileRepo</span><span class="p">(</span><span class="n">Repository</span><span class="p">):</span>
+<span class="linenos"> 2</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="linenos"> 3</span>        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+<span class="linenos"> 4</span>        <span class="n">Repository</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span>    <span class="k">def</span> <span class="nf">store_records</span><span class="p">(</span><span class="n">records</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TradeRecord</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos"> 8</span>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="linenos"> 9</span>            <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+<span class="linenos">10</span>                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">record</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos">11</span>        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">trades</span><span class="p">)</span><span class="si">}</span><span class="s1"> records have saved&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="reader-abstraction">
+<h2>Reader Abstraction<a class="headerlink" href="#reader-abstraction" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">class</span> <span class="nc">Reader</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="nd">@abstractmethod</span>
+<span class="linenos">3</span>    <span class="k">def</span> <span class="nf">read_data</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="linenos">4</span>        <span class="k">pass</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="version-4">
+<h1>Version 4<a class="headerlink" href="#version-4" title="Permalink to this headline"></a></h1>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">class</span> <span class="nc">TradeProcessor</span><span class="p">:</span>
+<span class="linenos"> 2</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">reader</span><span class="p">:</span> <span class="n">Reader</span><span class="p">,</span> <span class="n">parser</span><span class="p">:</span> <span class="n">Parser</span><span class="p">,</span> <span class="n">repo</span><span class="p">:</span> <span class="n">Repository</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos"> 3</span>        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">reader</span>
+<span class="linenos"> 4</span>        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="n">parser</span>
+<span class="linenos"> 5</span>        <span class="bp">self</span><span class="o">.</span><span class="n">repo</span> <span class="o">=</span> <span class="n">repo</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span>    <span class="k">def</span> <span class="nf">process_trades</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos"> 8</span>        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">read_data</span><span class="p">()</span>
+<span class="linenos"> 9</span>        <span class="n">trades</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse_trades</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+<span class="linenos">10</span>        <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">store_records</span><span class="p">(</span><span class="n">trades</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/complete.png" src="_images/complete.png" />
+<p>Here is a problem. Mark is using our framework but he is so lazy.
+His friend Eddy told him about a very nice Validator class that is part
+of some third party library. Mark would want to use that tested class.
+But there is a problem, it doesn’t implement the Validator interface and
+Mark doesn’t have access to it’s source code.</p>
+<img alt="_images/Adapter.png" src="_images/Adapter.png" />
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<dl class="simple">
+<dt>The Adapter Pattern</dt><dd><p>Convert the interface of a class into another interface clients expert.
+Adapter lets classes work together that couldn’t otherwise because of incompatible
+interfaces.</p>
+</dd>
+</dl>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Section05.html" class="btn btn-neutral float-left" title="Refactor for adaptability" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Section07.html" class="btn btn-neutral float-right" title="Demos" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Kasozi Vincent.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

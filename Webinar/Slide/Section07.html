@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demos &mdash; Design Patterns 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Abstractions" href="Section06.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Design Patterns
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Section01.html">Design Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section02.html">Case Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section03.html">Version One</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section04.html">Refactor for clarity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section04.html#version-two">Version Two</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section05.html">Refactor for adaptability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section05.html#version-three">Version Three</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section06.html">Abstractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section06.html#version-4">Version 4</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Demos</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Design Patterns</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Demos</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Section07.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="demos">
+<h1>Demos<a class="headerlink" href="#demos" title="Permalink to this headline"></a></h1>
+<p>For this first one. We are going to read from a text file and store to a text file.
+The record structure has now changed and the new structure is shown below;</p>
+<img alt="_images/newdataformat.png" src="_images/newdataformat.png" />
+<ul class="simple">
+<li><p>The ID is supposed to be 10 characters long and must only contain upper letters and numbers.</p></li>
+<li><p>The location can be any length and can contain both lower and upper case letters.</p></li>
+<li><p>The product name can be any length but only letters.</p></li>
+<li><p>The amount must be an integer.</p></li>
+</ul>
+<p>We will log to a file this time. So let us roll up a file logger.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">class</span> <span class="nc">FileLogger</span><span class="p">(</span><span class="n">Logger</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="linenos">3</span>        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+<span class="linenos">4</span>
+<span class="linenos">5</span>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+<span class="linenos">6</span>         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="linenos">7</span>                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This time round, we will map to a user defined class called Customer.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">class</span> <span class="nc">Customer</span><span class="p">:</span>
+<span class="linenos">2</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">amount</span><span class="p">):</span>
+<span class="linenos">3</span>        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+<span class="linenos">4</span>        <span class="bp">self</span><span class="o">.</span><span class="n">loc</span> <span class="o">=</span> <span class="n">loc</span>
+<span class="linenos">5</span>        <span class="bp">self</span><span class="o">.</span><span class="n">product</span> <span class="o">=</span> <span class="n">product</span>
+<span class="linenos">6</span>        <span class="bp">self</span><span class="o">.</span><span class="n">amount</span> <span class="o">=</span> <span class="n">amount</span>
+<span class="linenos">7</span>
+<span class="linenos">8</span>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">():</span>
+<span class="linenos">9</span>        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">loc</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">amount</span><span class="si">}</span><span class="s1">]&#39;</span>
+</pre></div>
+</div>
+<p>Cool, let us define a new Mapper class.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">class</span> <span class="nc">CustomerMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processed_record</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">TradeRecord</span><span class="p">:</span>
+<span class="linenos">3</span>        <span class="nb">id</span> <span class="o">=</span> <span class="n">processed_record</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="linenos">4</span>        <span class="n">location</span> <span class="o">=</span> <span class="n">processed_record</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="linenos">5</span>        <span class="n">product</span> <span class="o">=</span> <span class="n">processed_record</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="linenos">6</span>        <span class="n">amount</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">processed_record</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+<span class="linenos">7</span>        <span class="n">customer</span> <span class="o">=</span> <span class="n">Customer</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span><span class="n">product</span><span class="p">,</span> <span class="n">amount</span><span class="p">)</span>
+<span class="linenos">8</span>        <span class="k">return</span> <span class="n">customer</span>
+</pre></div>
+</div>
+<p>We will assume that different parts of the record are separated by commas so, we will reuse our CommaParser.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">class</span> <span class="nc">CommaParser</span><span class="p">(</span><span class="n">Parser</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validator</span><span class="p">:</span> <span class="n">Validator</span><span class="p">,</span> <span class="n">mapper</span><span class="p">:</span> <span class="n">Mapper</span><span class="p">):</span>
+<span class="linenos">3</span>        <span class="n">Parser</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">mapper</span><span class="p">)</span>
+<span class="linenos">4</span>
+<span class="linenos">5</span>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="linenos">6</span>        <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We will be reading from a text file so we can reuse our old Text file reader.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">class</span> <span class="nc">FileReader</span><span class="p">(</span><span class="n">Reader</span><span class="p">):</span>
+<span class="linenos"> 2</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="linenos"> 3</span>        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span>    <span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos"> 6</span>        <span class="n">trade_records</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos"> 7</span>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">data_source</span><span class="p">:</span>
+<span class="linenos"> 8</span>            <span class="k">for</span> <span class="n">trade_record</span> <span class="ow">in</span> <span class="n">data_source</span><span class="p">:</span>
+<span class="linenos"> 9</span>                <span class="n">trade_records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trade_record</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span>
+<span class="linenos">10</span>        <span class="k">return</span> <span class="n">trade_records</span>
+</pre></div>
+</div>
+<p>Now for the validator, things are a little bit different. We don’t want to write the validator class
+ourselves since it is not our expertise. And still, we have access to a third party class but we haven’t
+access to it’s source code so we can not make it inherit from our Validator class.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">class</span> <span class="nc">FancyValidator</span><span class="p">:</span>
+<span class="linenos"> 2</span>    <span class="k">def</span> <span class="nf">approve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="linenos"> 3</span>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+<span class="linenos"> 4</span>            <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">isalnum</span><span class="p">():</span>
+<span class="linenos"> 5</span>                <span class="k">return</span> <span class="kc">True</span>
+<span class="linenos"> 6</span>            <span class="k">else</span><span class="p">:</span>
+<span class="linenos"> 7</span>                <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos"> 8</span>        <span class="k">else</span><span class="p">:</span>
+<span class="linenos"> 9</span>            <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span>    <span class="k">def</span> <span class="nf">isword</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loc</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="linenos">12</span>        <span class="k">if</span> <span class="n">loc</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span>
+<span class="linenos">13</span>                <span class="k">return</span> <span class="kc">True</span>
+<span class="linenos">14</span>        <span class="k">else</span><span class="p">:</span>
+<span class="linenos">15</span>                <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span>    <span class="k">def</span> <span class="nf">isnumber</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="linenos">18</span>        <span class="k">if</span> <span class="n">number</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+<span class="linenos">19</span>            <span class="k">return</span> <span class="kc">True</span>
+<span class="linenos">20</span>        <span class="k">else</span><span class="p">:</span>
+<span class="linenos">21</span>            <span class="k">return</span> <span class="kc">False</span>
+</pre></div>
+</div>
+<p>Is there any design pattern to save us??</p>
+<p>Let us create a new class that inherits from our Validator abstraction.
+We are going to use this class to wrap the third party class.</p>
+<p>Let’s dive into some code…</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">class</span> <span class="nc">Adapter</span><span class="p">(</span><span class="n">Validator</span><span class="p">):</span>
+<span class="linenos"> 2</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">adaptee</span><span class="p">:</span> <span class="n">FancyValidator</span><span class="p">):</span>
+<span class="linenos"> 3</span>        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+<span class="linenos"> 4</span>        <span class="bp">self</span><span class="o">.</span><span class="n">adaptee</span> <span class="o">=</span> <span class="n">adaptee</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="linenos"> 8</span>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">record</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span> <span class="c1">#check number of fields</span>
+<span class="linenos"> 9</span>            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1"> malformed. Only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">record</span><span class="p">)</span><span class="si">}</span><span class="s1"> field(s) found.&#39;</span><span class="p">)</span>
+<span class="linenos">10</span>            <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos">11</span>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptee</span><span class="o">.</span><span class="n">approve</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span> <span class="c1">#check id</span>
+<span class="linenos">12</span>            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Id on line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1"> malformed: </span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos">13</span>            <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos">14</span>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptee</span><span class="o">.</span><span class="n">isword</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span> <span class="c1">#check location</span>
+<span class="linenos">15</span>            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Location on </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> is invalid: &#39;</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<span class="linenos">16</span>            <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos">17</span>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptee</span><span class="o">.</span><span class="n">isword</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span> <span class="c1">#check product</span>
+<span class="linenos">18</span>            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Product name on </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> is invalid: &#39;</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<span class="linenos">19</span>            <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos">20</span>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptee</span><span class="o">.</span><span class="n">isnumber</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="mi">3</span><span class="p">]):</span>
+<span class="linenos">21</span>            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Amount on line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1"> not a valid int:</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos">22</span>            <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos">23</span>        <span class="k">return</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<dl class="simple">
+<dt>The Adapter Pattern</dt><dd><p>Convert the interface of a class into another interface clients expert.
+Adapter lets classes work together that couldn’t otherwise because of incompatible interfaces.</p>
+</dd>
+</dl>
+</div>
+<p>Finally we have the TradeProcessor class.</p>
+<img alt="_images/graph.png" src="_images/graph.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="n">mapper</span> <span class="o">=</span> <span class="n">CustomerMapper</span><span class="p">()</span>
+<span class="linenos"> 2</span><span class="n">logger</span> <span class="o">=</span> <span class="n">FileLogger</span><span class="p">(</span><span class="s1">&#39;run.log&#39;</span><span class="p">)</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="n">fancy_validator</span> <span class="o">=</span> <span class="n">FancyValidator</span><span class="p">()</span>
+<span class="linenos"> 5</span><span class="n">validator</span> <span class="o">=</span> <span class="n">Adapter</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">fancy_validator</span><span class="p">)</span>
+<span class="linenos"> 6</span><span class="n">parser</span> <span class="o">=</span> <span class="n">CommaParser</span><span class="p">(</span><span class="n">validator</span><span class="p">,</span> <span class="n">mapper</span><span class="p">)</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span><span class="n">repo</span> <span class="o">=</span> <span class="n">FileRepo</span><span class="p">(</span><span class="s1">&#39;store.txt&#39;</span><span class="p">)</span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span><span class="n">reader</span> <span class="o">=</span> <span class="n">FileReader</span><span class="p">(</span><span class="s1">&#39;Data2.txt&#39;</span><span class="p">)</span>
+<span class="linenos">11</span><span class="n">tradeProcessor</span> <span class="o">=</span> <span class="n">TradeProcessor</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">repo</span><span class="p">)</span>
+<span class="linenos">12</span><span class="n">tradeProcessor</span><span class="o">.</span><span class="n">process_trades</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Section06.html" class="btn btn-neutral float-left" title="Abstractions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Kasozi Vincent.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

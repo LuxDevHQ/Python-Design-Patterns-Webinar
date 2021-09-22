@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Refactor for clarity &mdash; Design Patterns 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Refactor for adaptability" href="Section05.html" />
+    <link rel="prev" title="Version One" href="Section03.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Design Patterns
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Section01.html">Design Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section02.html">Case Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section03.html">Version One</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Refactor for clarity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#read-records">read_records()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parse-records">parse_records()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#store-records">store_records()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#validate-trade-data">validate_trade_data()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#map-record-to-object">map_record_to_object()</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#version-two">Version Two</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section05.html">Refactor for adaptability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section05.html#version-three">Version Three</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section06.html">Abstractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section06.html#version-4">Version 4</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Section07.html">Demos</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Design Patterns</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Refactor for clarity</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Section04.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="refactor-for-clarity">
+<h1>Refactor for clarity<a class="headerlink" href="#refactor-for-clarity" title="Permalink to this headline"></a></h1>
+<p>The root cause of this problem is the <cite>process_trades</cite> function, it is doing more than one thing.
+We are going to break the <cite>process_trades</cite> function into smaller functions. Its new responsibility
+will be to cordinate the working of these smaller more focused functions.</p>
+<img alt="_images/Cuttheclass.png" src="_images/Cuttheclass.png" />
+<p>Let us start by breaking the <cite>process_trades</cite> method into smaller focused methods.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">process_trades</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">2</span>    <span class="n">raw_records</span> <span class="o">=</span> <span class="n">read_records</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+<span class="linenos">3</span>    <span class="n">parsed_records</span> <span class="o">=</span> <span class="n">parse_records</span><span class="p">(</span><span class="n">raw_records</span><span class="p">)</span>
+<span class="linenos">4</span>    <span class="n">store_records</span><span class="p">(</span><span class="n">parsed_records</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="read-records">
+<h2>read_records()<a class="headerlink" href="#read-records" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="linenos">2</span>
+<span class="linenos">3</span><span class="k">def</span> <span class="nf">read_records</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="linenos">4</span>    <span class="n">trade_records</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">5</span>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">data_source</span><span class="p">:</span>
+<span class="linenos">6</span>        <span class="k">for</span> <span class="n">trade_record</span> <span class="ow">in</span> <span class="n">data_source</span><span class="p">:</span>
+<span class="linenos">7</span>            <span class="n">trade_records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trade_record</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span>
+<span class="linenos">8</span>    <span class="k">return</span> <span class="n">trade_records</span>
+</pre></div>
+</div>
+</section>
+<section id="parse-records">
+<h2>parse_records()<a class="headerlink" href="#parse-records" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">def</span> <span class="nf">parse_records</span><span class="p">(</span><span class="n">trade_records</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">TradeRecord</span><span class="p">]:</span>
+<span class="linenos"> 2</span>    <span class="n">trades</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TradeRecord</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos"> 3</span>    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trade_records</span><span class="p">):</span>
+<span class="linenos"> 4</span>        <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+<span class="linenos"> 5</span>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span> <span class="c1">#validation</span>
+<span class="linenos"> 6</span>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1"> malformed. </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span><span class="si">}</span><span class="s1"> field(s) found.&#39;</span><span class="p">)</span> <span class="c1">#logging</span>
+<span class="linenos"> 7</span>            <span class="k">continue</span>
+<span class="linenos"> 8</span>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span><span class="c1">#validation</span>
+<span class="linenos"> 9</span>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Trade currencies on line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1"> malformed: &quot;</span><span class="si">{</span><span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span> <span class="c1">#logging</span>
+<span class="linenos">10</span>            <span class="k">continue</span>
+<span class="linenos">11</span>        <span class="k">try</span><span class="p">:</span>
+<span class="linenos">12</span>            <span class="n">trade_amount</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1">#validation</span>
+<span class="linenos">13</span>        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+<span class="linenos">14</span>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trade amount on line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> not a valid integer: &#39;</span><span class="si">{</span><span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span> <span class="c1">#logging</span>
+<span class="linenos">15</span>            <span class="k">continue</span>
+<span class="linenos">16</span>        <span class="k">try</span><span class="p">:</span>
+<span class="linenos">17</span>            <span class="n">trade_price</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="c1">#validation</span>
+<span class="linenos">18</span>        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+<span class="linenos">19</span>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trade price on line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> not a valid decimal:&#39;</span><span class="si">{</span><span class="n">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span> <span class="c1">#logging</span>
+<span class="linenos">20</span>            <span class="k">continue</span>
+<span class="linenos">21</span>
+<span class="linenos">22</span>        <span class="c1">#map validated records to domain objects</span>
+<span class="linenos">23</span>        <span class="n">sourceCurrencyCode</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">3</span><span class="p">]</span>
+<span class="linenos">24</span>        <span class="n">destinationCurrencyCode</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">:]</span>
+<span class="linenos">25</span>        <span class="n">trade</span> <span class="o">=</span> <span class="n">TradeRecord</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">sourceCurrencyCode</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">destinationCurrencyCode</span><span class="p">,</span>
+<span class="linenos">26</span>                                <span class="n">amount</span><span class="o">=</span><span class="n">trade_amount</span><span class="p">,</span> <span class="n">price</span><span class="o">=</span><span class="n">trade_price</span><span class="p">)</span>
+<span class="linenos">27</span>        <span class="n">trades</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trade</span><span class="p">)</span>
+<span class="linenos">28</span>    <span class="k">return</span> <span class="n">trades</span>
+</pre></div>
+</div>
+</section>
+<section id="store-records">
+<h2>store_records()<a class="headerlink" href="#store-records" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">def</span> <span class="nf">store_records</span><span class="p">(</span><span class="n">trades</span><span class="p">:</span> <span class="n">ProcessedRecords</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos"> 2</span>    <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;postgresql://postgres:HUFJD1@localhost:5432/python&#39;</span><span class="p">)</span>
+<span class="linenos"> 3</span>    <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+<span class="linenos"> 4</span>    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+<span class="linenos"> 5</span>    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="linenos"> 6</span>    <span class="k">for</span> <span class="n">trade</span> <span class="ow">in</span> <span class="n">trades</span><span class="p">:</span>
+<span class="linenos"> 7</span>        <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">trade</span><span class="p">)</span>
+<span class="linenos"> 8</span>    <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="linenos"> 9</span>    <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="linenos">10</span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">trades</span><span class="p">)</span><span class="si">}</span><span class="s1"> records have saved&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>So far so good. We have created more focused functions from the giant <cite>process_trades</cite> function. Well done!!</p>
+<img alt="_images/Newmethods.png" src="_images/Newmethods.png" />
+<p><strong>We can do much better</strong></p>
+<p>I don’t know about you but for me. <cite>parse_records</cite> is still doing more than one thing. We can do better trust me. It has the following responsibilites.</p>
+<ul class="simple">
+<li><p>It is parsing the records</p></li>
+<li><p>It is validating the records</p></li>
+<li><p>It is logging the errors</p></li>
+<li><p>It is mapping raw records to domain objects</p></li>
+</ul>
+<p>Let us break it even further. Let’s go!!!
+Here is our definition of the <cite>parse_trades</cite> function</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">parse_trades</span><span class="p">(</span><span class="n">trade_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">TradeRecord</span><span class="p">]:</span>
+<span class="linenos">2</span>    <span class="n">trades</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">3</span>    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trade_data</span><span class="p">):</span>
+<span class="linenos">4</span>        <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+<span class="linenos">5</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">validate_trade_data</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+<span class="linenos">6</span>            <span class="k">continue</span>
+<span class="linenos">7</span>        <span class="n">trade</span> <span class="o">=</span> <span class="n">map_record_to_object</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
+<span class="linenos">8</span>        <span class="n">trades</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trade</span><span class="p">)</span>
+<span class="linenos">9</span>    <span class="k">return</span> <span class="n">trades</span>
+</pre></div>
+</div>
+<p>We have introduced 2 new functions. <cite>validate_trade_data</cite> and <cite>map_record_to_object</cite>.</p>
+<ul class="simple">
+<li><p><cite>validate_trade_data</cite> is responsible for validation and,</p></li>
+<li><p><cite>map_record_to_object</cite> is responsible for mapping processed records to domain objects.</p></li>
+</ul>
+</section>
+<section id="validate-trade-data">
+<h2>validate_trade_data()<a class="headerlink" href="#validate-trade-data" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">def</span> <span class="nf">validate_trade_data</span><span class="p">(</span><span class="n">record</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="linenos"> 2</span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">record</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+<span class="linenos"> 3</span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1"> malformed. Only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span><span class="si">}</span><span class="s1"> field(s) found.&#39;</span><span class="p">)</span>
+<span class="linenos"> 4</span>        <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos"> 5</span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span>
+<span class="linenos"> 6</span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Trade currencies on line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1"> malformed: </span><span class="si">{</span><span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos"> 7</span>        <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos"> 8</span>    <span class="k">try</span><span class="p">:</span>
+<span class="linenos"> 9</span>        <span class="n">trade_amount</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="linenos">10</span>    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+<span class="linenos">11</span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trade amount on line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> not a valid integer: &#39;</span><span class="si">{</span><span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<span class="linenos">12</span>        <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos">13</span>    <span class="k">try</span><span class="p">:</span>
+<span class="linenos">14</span>        <span class="n">trade_price</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="linenos">15</span>    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+<span class="linenos">16</span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Trade price on line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1"> not a valid decimal:</span><span class="si">{</span><span class="n">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos">17</span>        <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos">18</span>    <span class="k">return</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</section>
+<section id="map-record-to-object">
+<h2>map_record_to_object()<a class="headerlink" href="#map-record-to-object" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">map_record_to_object</span><span class="p">(</span><span class="n">processed_record</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">TradeRecord</span><span class="p">:</span>
+<span class="linenos">2</span>    <span class="n">in_curr</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="linenos">3</span>    <span class="n">out_curr</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="linenos">4</span>    <span class="n">source_curr_code</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">in_curr</span><span class="p">]</span>
+<span class="linenos">5</span>    <span class="n">dest_curr_code</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">out_curr</span><span class="p">]</span>
+<span class="linenos">6</span>    <span class="n">trade_amount</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="linenos">7</span>    <span class="n">trade_price</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="linenos">8</span>    <span class="n">trade_record</span> <span class="o">=</span> <span class="n">TradeRecord</span><span class="p">(</span><span class="n">source_curr_code</span><span class="p">,</span> <span class="n">dest_curr_code</span><span class="p">,</span><span class="n">trade_amount</span><span class="p">,</span> <span class="n">trade_price</span><span class="p">)</span>
+<span class="linenos">9</span>    <span class="k">return</span> <span class="n">trade_record</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Unit Testing is good. Don’t forget please.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">log_message</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">2</span>    <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/specialmethods.png" src="_images/specialmethods.png" />
+</section>
+</section>
+<section id="version-two">
+<h1>Version Two<a class="headerlink" href="#version-two" title="Permalink to this headline"></a></h1>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">class</span> <span class="nc">TradeProcessor</span><span class="p">:</span>
+<span class="linenos"> 2</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="linenos"> 3</span>        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span>    <span class="k">def</span> <span class="nf">_log_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos"> 6</span>        <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span>    <span class="k">def</span> <span class="nf">process_trades</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos"> 9</span>        <span class="n">raw_records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_records</span><span class="p">()</span>
+<span class="linenos">10</span>        <span class="n">parsed_records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_records</span><span class="p">(</span><span class="n">raw_records</span><span class="p">)</span>
+<span class="linenos">11</span>        <span class="bp">self</span><span class="o">.</span><span class="n">_store_records</span><span class="p">(</span><span class="n">parsed_records</span><span class="p">)</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span>    <span class="k">def</span> <span class="nf">_read_records</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="linenos">14</span>        <span class="n">trade_records</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">15</span>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">data_source</span><span class="p">:</span>
+<span class="linenos">16</span>            <span class="k">for</span> <span class="n">trade_record</span> <span class="ow">in</span> <span class="n">data_source</span><span class="p">:</span>
+<span class="linenos">17</span>                <span class="n">trade_records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trade_record</span><span class="p">)</span>
+<span class="linenos">18</span>        <span class="k">return</span> <span class="n">trade_records</span>
+<span class="linenos">19</span>
+<span class="linenos">20</span>    <span class="k">def</span> <span class="nf">_parse_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trade_data</span><span class="p">:</span> <span class="n">RawRecords</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">TradeRecord</span><span class="p">]:</span>
+<span class="linenos">21</span>        <span class="n">trades</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">22</span>        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trade_data</span><span class="p">):</span>
+<span class="linenos">23</span>            <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+<span class="linenos">24</span>            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_trade_data</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+<span class="linenos">25</span>                <span class="k">continue</span>
+<span class="linenos">26</span>            <span class="n">trade</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map_record_to_object</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
+<span class="linenos">27</span>            <span class="n">trades</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trade</span><span class="p">)</span>
+<span class="linenos">28</span>        <span class="k">return</span> <span class="n">trades</span>
+<span class="linenos">29</span>
+<span class="linenos">30</span>    <span class="k">def</span> <span class="nf">_map_record_to_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processed_record</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">TradeRecord</span><span class="p">:</span>
+<span class="linenos">31</span>        <span class="n">in_curr</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+<span class="linenos">32</span>        <span class="n">out_curr</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="linenos">33</span>        <span class="n">source_curr_code</span> <span class="o">=</span> <span class="n">processed_record</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">in_curr</span><span class="p">]</span>
+<span class="linenos">34</span>        <span class="n">dest_curr_code</span> <span class="o">=</span> <span class="n">processed_record</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">out_curr</span><span class="p">]</span>
+<span class="linenos">35</span>        <span class="n">trade_amount</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">processed_record</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="linenos">36</span>        <span class="n">trade_price</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">processed_record</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="linenos">37</span>        <span class="n">trade_record</span> <span class="o">=</span> <span class="n">TradeRecord</span><span class="p">(</span><span class="n">source_curr_code</span><span class="p">,</span> <span class="n">dest_curr_code</span><span class="p">,</span><span class="n">trade_amount</span><span class="p">,</span> <span class="n">trade_price</span><span class="p">)</span>
+<span class="linenos">38</span>        <span class="k">return</span> <span class="n">trade_record</span>
+<span class="linenos">39</span>
+<span class="linenos">40</span>    <span class="k">def</span> <span class="nf">_store_records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trades</span><span class="p">:</span> <span class="n">ProcessedRecords</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="linenos">41</span>        <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s1">&#39;postgresql://postgres:u2402/501@localhost:5432/python&#39;</span><span class="p">)</span>
+<span class="linenos">42</span>        <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+<span class="linenos">43</span>        <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+<span class="linenos">44</span>        <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="linenos">45</span>        <span class="k">for</span> <span class="n">trade</span> <span class="ow">in</span> <span class="n">trades</span><span class="p">:</span>
+<span class="linenos">46</span>            <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">trade</span><span class="p">)</span>
+<span class="linenos">47</span>        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="linenos">48</span>        <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="linenos">49</span>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">trades</span><span class="p">)</span><span class="si">}</span><span class="s1"> records have saved&#39;</span><span class="p">)</span>
+<span class="linenos">50</span>
+<span class="linenos">51</span>    <span class="k">def</span> <span class="nf">_validate_trade_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="linenos">52</span>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">record</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+<span class="linenos">53</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1"> malformed. Only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">record</span><span class="p">)</span><span class="si">}</span><span class="s1"> field(s) found.&#39;</span><span class="p">)</span>
+<span class="linenos">54</span>            <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos">55</span>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span>
+<span class="linenos">56</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Trade currencies on line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1"> malformed: </span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos">57</span>            <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos">58</span>        <span class="k">try</span><span class="p">:</span>
+<span class="linenos">59</span>            <span class="n">trade_amount</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="linenos">60</span>        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+<span class="linenos">61</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trade amount on line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> not a valid integer: &#39;</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<span class="linenos">62</span>            <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos">63</span>        <span class="k">try</span><span class="p">:</span>
+<span class="linenos">64</span>            <span class="n">trade_price</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="linenos">65</span>        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+<span class="linenos">66</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Trade price on line </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1"> not a valid decimal:</span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="linenos">67</span>            <span class="k">return</span> <span class="kc">False</span>
+<span class="linenos">68</span>        <span class="k">return</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Section03.html" class="btn btn-neutral float-left" title="Version One" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Section05.html" class="btn btn-neutral float-right" title="Refactor for adaptability" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Kasozi Vincent.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
